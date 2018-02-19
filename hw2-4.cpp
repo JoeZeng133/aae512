@@ -71,12 +71,11 @@ void laxWendroff (string filename, double dt) {
         for(int j = 1; j < spaceSteps; ++j)
             u[now][j] = u[prev][j] - c1 * (u[prev][j + 1] - u[prev][j - 1])
             + c2 * (u[prev][j + 1] + u[prev][j - 1] - 2 * u[prev][j]);
-
+        //alternate arrays
         now ^= 1;
     }
     //writing to file
-    prev = now ^ 1;
-    fo.write((char*)&u[prev][0], sizeof(double) * (spaceSteps + 1));
+    fo.write((char*)&u[now ^ 1][0], sizeof(double) * (spaceSteps + 1));
     fo.close();
 }
 
@@ -111,18 +110,18 @@ void implicitEuler(string filename, double dt) {
         tridiag(&a[0], &d[0], &c[0], &u[prev][1], &u[now][1], spaceSteps - 1);
         //force boundary conditions
         u[now].front() = u[now].back() = 0;
+        //alternate array
         now ^= 1;
     }
     //write to file
-    prev = now ^ 1;
-    fo.write((char*)&u[prev][0], sizeof(double) * (spaceSteps + 1));
+    fo.write((char*)&u[now ^ 1][0], sizeof(double) * (spaceSteps + 1));
     fo.close();
 }
 
 int main(int argc, char* args[]) {
-    laxWendroff("a25.bin", 2.5e-3);
-    laxWendroff("a50.bin", 5e-3);
+    laxWendroff("Lax_dt=2.5e-3.bin", 2.5e-3);
+    laxWendroff("Lax_dt=5e-3.bin", 5e-3);
 
-    implicitEuler("b25.bin", 2.5e-3);
-    implicitEuler("b50.bin", 5e-3);
+    implicitEuler("Implicit_dt=2.5e-3.bin", 2.5e-3);
+    implicitEuler("Implicit_dt=5e-3.bin", 5e-3);
 }
