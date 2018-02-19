@@ -4,6 +4,8 @@
 #include <fstream>
 #include <vector>
 
+#define spaceSteps 70
+#define dx 1
 #define SQR(x) ((x) * (x))
 
 using namespace std;
@@ -48,8 +50,6 @@ void laxWendroff (string filename, double dt) {
     fo.open(filename, ios :: out | ios :: binary);
 
     const int timeSteps = 0.15 / dt;
-    const int spaceSteps = 70;
-    const double dx = 1;
     const double c1 = 200 * dt / 2 / dx;
     const double c2 = SQR(c1) * 2;
     int now = 0, prev = 1;
@@ -84,8 +84,6 @@ void implicitEuler(string filename, double dt) {
     fo.open(filename, ios :: out | ios :: binary);
 
     const int timeSteps = 0.15 / dt;
-    const int spaceSteps = 70;
-    const double dx = 1;
     const double c1 = 200 * dt / dx;
     int now = 0, prev = 1;
 
