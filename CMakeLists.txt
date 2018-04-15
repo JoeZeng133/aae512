@@ -1,11 +1,9 @@
-project(aae512)
-set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_CXX_STANDARD 14)
+cmake_minimum_required (VERSION 3.9)
+project(mesh)
+set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_CXX_STANDARD 11)
 
-find_package( Armadillo REQUIRED )
-include_directories(${ARMADILLO_INCLUDE_DIRS})
+include_directories(headers)
 
-#However, the file(GLOB...) allows for wildcard additions:
-file(GLOB SOURCES "./hw2-4.cpp")
-add_executable(aae512 ${SOURCES})
-target_link_libraries(aae512 ${ARMADILLO_LIBRARIES})
+file(GLOB SOURCES "src/*.cpp")
+add_executable(mesh ${SOURCES})
