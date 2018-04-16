@@ -95,6 +95,8 @@ namespace slor {
 			dd[j] = -2 * (gamma[j] + arg2);
 			cc[j] = gamma[j] * (1 + arg1);
 
+			//cout << MIXED(yc, j, M) << " "  << MIXED(xc, j, M) << endl;
+
 			bbx[j] = -arg2 * AVE(xc, j, M) - arg3 * DIF(xc, j, M) + arg4 * MIXED(xc, j, M);
 			bby[j] = -arg2 * AVE(yc, j, M) - arg3 * DIF(yc, j, M) + arg4 * MIXED(yc, j, M);
 		}
@@ -108,9 +110,9 @@ namespace slor {
 		bby[0] = yc[0];
 		bby[M - 1] = yc[M - 1];
 
-		for (int j = 0; j < M; ++j) {
+	/*	for (int j = 0; j < M; ++j) {
 			printf("%5.3e %5.3e %5.3e %5.3e %5.3e\n", aa[j], dd[j], cc[j], bbx[j], bby[j]);
-		}
+		}*/
 
 		//line gaussian-seidel
 		memcpy(tmp, dd, sizeof(double) * M);
@@ -156,6 +158,33 @@ void getPQ(const Mat& xc, const Mat& yc, Mat& psi, Mat& phi, double etad, double
 	xc.getSize(N, M);
 
 	//get boundary values
+	/*for (int i = 1; i < N - 1; ++i)
+		for (int j = 1; j < M - 1; ++j) {
+			xp = FIR_DER_X(xc, i, j);
+			xpp = SEC_DER_X(xc, i, j);
+			yp = FIR_DER_X(yc, i, j);
+			ypp = SEC_DER_X(yc, i, j);
+			phi(i, j) = -(xp * xpp + yp * ypp) / (xp * xp + yp * yp);
+
+			xp = FIR_DER_X(xc, i, j);
+			xpp = SEC_DER_X(xc, i, j);
+			yp = FIR_DER_X(yc, i, j);
+			ypp = SEC_DER_X(yc, i, j);
+			phi(i, j) = -(xp * xpp + yp * ypp) / (xp * xp + yp * yp);
+
+			xp = FIR_DER_Y(xc, i, j);
+			xpp = SEC_DER_Y(xc, i, j);
+			yp = FIR_DER_Y(yc, i, j);
+			ypp = SEC_DER_Y(yc, i, j);
+			psi(i, j) = -(xp * xpp + yp * ypp) / (xp * xp + yp * yp);
+
+			xp = FIR_DER_Y(xc, i, j);
+			xpp = SEC_DER_Y(xc, i, j);
+			yp = FIR_DER_Y(yc, i, j);
+			ypp = SEC_DER_Y(yc, i, j);
+			psi(i, j) = -(xp * xpp + yp * ypp) / (xp * xp + yp * yp);
+		}*/
+
 	for (int i = 1; i < N - 1; ++i) {
 		xp = FIR_DER_X(xc, i, M - 1);
 		xpp = SEC_DER_X(xc, i, M - 1);
@@ -169,7 +198,6 @@ void getPQ(const Mat& xc, const Mat& yc, Mat& psi, Mat& phi, double etad, double
 		ypp = SEC_DER_X(yc, i, 0);
 		phi(i, 0) = -(xp * xpp + yp * ypp) / (xp * xp + yp * yp);
 
-		
 	}
 
 	for (int j = 1; j < M - 1; ++j) {
@@ -177,13 +205,13 @@ void getPQ(const Mat& xc, const Mat& yc, Mat& psi, Mat& phi, double etad, double
 		xpp = SEC_DER_Y(xc, N - 1, j);
 		yp = FIR_DER_Y(yc, N - 1, j);
 		ypp = SEC_DER_Y(yc, N - 1, j);
-		phi(N - 1, j) = -(xp * xpp + yp * ypp) / (xp * xp + yp * yp);
+		psi(N - 1, j) = -(xp * xpp + yp * ypp) / (xp * xp + yp * yp);
 
 		xp = FIR_DER_Y(xc, 0, j);
 		xpp = SEC_DER_Y(xc, 0, j);
 		yp = FIR_DER_Y(yc, 0, j);
 		ypp = SEC_DER_Y(yc, 0, j);
-		phi(0, j) = -(xp * xpp + yp * ypp) / (xp * xp + yp * yp);
+		psi(0, j) = -(xp * xpp + yp * ypp) / (xp * xp + yp * yp);
 
 		//printf("%9.3e %9.3e %9.3e %9.3e\n", xp, xpp, yp, ypp);
 	}
@@ -202,6 +230,7 @@ double calcError(const Mat& A, const Mat& B) {
 	double arg, diff = 0, norm = 0;
 	A.getSize(N, M);
 
+
 	for (int i = 0; i < N; ++i)
 		for (int j = 0; j < M; ++j) {
 			arg = A(i, j) - B(i, j);
@@ -215,8 +244,8 @@ double calcError(const Mat& A, const Mat& B) {
 void read(fstream& fo, Mat& xc, Mat& yc, int& N, int& M) {
 	fo.read((char*)&N, sizeof(int));
 	fo.read((char*)&M, sizeof(int));
-	xc.ones(N, M);
-	yc.ones(N, M);
+	xc.rand(N, M);
+	yc.rand(N, M);
 
 	for (int i = 0; i < N - 1; ++i) {
 		fo.read((char*)&xc(i, 0), sizeof(double));
@@ -239,27 +268,27 @@ void read(fstream& fo, Mat& xc, Mat& yc, int& N, int& M) {
 	}
 }
 
+
+
 int main() {
 	int N, M;
 	int maxItr = 200;
 	double etad, ksid;
-	double tol = 1e-4;
+	double tol = 1e-5;
 	fstream fo;
 	Mat xc, yc, alpha, gamma, beta, psi, phi, xprev, yprev;
 
 	fo.open("../output/bnd.bin", ios::in | ios::binary);
 	if (!fo.is_open()) {
-		cout << "Fail to Open File" << endl;
+		std::cout << "Fail to Open File" << endl;
 		exit(1);
 	}
 	read(fo, xc, yc, N, M);
 	etad = 1. / (M - 1);
 	ksid = 1. / (N - 1);
 
-	psi.ones(N, M);
-	phi.ones(N, M);
-	getPQ(xc, yc, psi, phi, etad, ksid);
-
+	psi.zeros(N, M);
+	phi.zeros(N, M);
 	alpha.ones(N, M);
 	gamma.ones(N, M);
 	beta.ones(N, M);
@@ -270,19 +299,46 @@ int main() {
 		xprev = xc;
 		yprev = yc;
 		//Successive Line Over Relaxation
-		for (int i = 0; i < N; ++i) {
+		for (int i = 1; i < N - 1; ++i) {
 			slor::slor(etad, ksid, &xc(i, 0), &yc(i, 0), &alpha(i, 0), &beta(i, 0), &gamma(i, 0), &phi(i, 0), &psi(i, 0));
 		}
 		
 		double xerror = calcError(xprev, xc);
 		double yerror = calcError(yprev, yc);
-		cout << "At iteration" << itr << ", the error is : xerror = " << xerror << ", yerror = " << yerror << endl;
+		std::cout << "At iteration" << itr << ", the error is : xerror = " << xerror << ", yerror = " << yerror << endl;
 		if (xerror < tol && yerror < tol) {
-			cout << "Solution Converged" << endl;
+			std::cout << "Solution Converged" << endl;
+			break;
+		}
+	}
+
+	getPQ(xc, yc, psi, phi, etad, ksid);
+	for (int itr = 0; itr < maxItr; ++itr) {
+		updateJacobian(xc, yc, alpha, beta, gamma, etad, ksid);
+		xprev = xc;
+		yprev = yc;
+		//Successive Line Over Relaxation
+		for (int i = 1; i < N - 1; ++i) {
+			slor::slor(etad, ksid, &xc(i, 0), &yc(i, 0), &alpha(i, 0), &beta(i, 0), &gamma(i, 0), &phi(i, 0), &psi(i, 0));
+		}
+
+		double xerror = calcError(xprev, xc);
+		double yerror = calcError(yprev, yc);
+		std::cout << "At iteration" << itr << ", the error is : xerror = " << xerror << ", yerror = " << yerror << endl;
+		if (xerror < tol && yerror < tol) {
+			std::cout << "Solution Converged" << endl;
 			break;
 		}
 	}
 
 	fo.close();
+
+	fo.open("../output/mesh.bin", ios::out | ios::binary);
+	std::cout << xc.getSize() << " " << yc.getSize() << endl;
+	fo.write((char*)xc.data(), sizeof(double) * xc.getSize());
+	fo.write((char*)yc.data(), sizeof(double) * yc.getSize());
+	fo.close();
+
+	system("PAUSE");
 	return 0;
 }

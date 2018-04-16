@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <vector>
 #include <algorithm>
 
@@ -38,9 +38,14 @@ public:
 	}
 	~Mat() = default;
 
+	double* data() {
+		return databuffer;
+	}
+
 	void resize(const size_t x, const size_t y) {
 		M = y; N = x;
-		datareal.resize(N * M);
+		_size = M * N;
+		datareal.resize(_size);
 		databuffer = datareal.data();
 	}
 
@@ -58,8 +63,19 @@ public:
 		std::fill(datareal.begin(), datareal.end(), 1);
 	}
 
+	void rand(const size_t x, const size_t y) {
+		resize(x, y);
+		for (auto& i : datareal) {
+			i = double(std::rand()) / RAND_MAX;
+		}
+	}
+
 	void getSize(int& n, int& m) const{
 		n = N;
 		m = M;
+	}
+
+	size_t getSize() {
+		return _size;
 	}
 };
