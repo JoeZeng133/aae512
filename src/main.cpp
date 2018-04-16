@@ -333,12 +333,13 @@ int main() {
 
 	fo.close();
 
+
 	fo.open("../output/mesh.bin", ios::out | ios::binary);
 	std::cout << xc.getSize() << " " << yc.getSize() << endl;
 	fo.write((char*)xc.data(), sizeof(double) * xc.getSize());
 	fo.write((char*)yc.data(), sizeof(double) * yc.getSize());
 	fo.close();
 
-	system("PAUSE");
+	//system("PAUSE");
 	return 0;
 }
