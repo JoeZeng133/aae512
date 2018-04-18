@@ -58,7 +58,7 @@ namespace slor {
 	void init(int _N, int _M) {
 		N = _N;
 		M = _M;
-		omega = 1.5;
+		omega = 1.7;
 		aa = new double[M];
 		dd = new double[M];
 		cc = new double[M];
@@ -241,7 +241,8 @@ double calcError(const Mat& A, const Mat& B) {
 	return sqrt(diff / norm);
 }
 
-void read(fstream& fo, Mat& xc, Mat& yc, int& N, int& M) {
+void read(fstream& fo, Mat& xc, Mat& yc, int& N, int& M, int& clustering) {
+	fo.read((char*)&clustering, sizeof(int));
 	fo.read((char*)&N, sizeof(int));
 	fo.read((char*)&M, sizeof(int));
 	xc.rand(N, M);
@@ -271,6 +272,7 @@ void read(fstream& fo, Mat& xc, Mat& yc, int& N, int& M) {
 
 
 int main() {
+	int clustering;
 	int N, M;
 	int maxItr = 200;
 	double etad, ksid;
@@ -283,7 +285,7 @@ int main() {
 		std::cout << "Fail to Open File" << endl;
 		exit(1);
 	}
-	read(fo, xc, yc, N, M);
+	read(fo, xc, yc, N, M, clustering);
 	etad = 1. / (M - 1);
 	ksid = 1. / (N - 1);
 
@@ -312,24 +314,27 @@ int main() {
 		}
 	}
 
-	getPQ(xc, yc, psi, phi, etad, ksid);
-	for (int itr = 0; itr < maxItr; ++itr) {
-		updateJacobian(xc, yc, alpha, beta, gamma, etad, ksid);
-		xprev = xc;
-		yprev = yc;
-		//Successive Line Over Relaxation
-		for (int i = 1; i < N - 1; ++i) {
-			slor::slor(etad, ksid, &xc(i, 0), &yc(i, 0), &alpha(i, 0), &beta(i, 0), &gamma(i, 0), &phi(i, 0), &psi(i, 0));
-		}
+	if (clustering) {
+		getPQ(xc, yc, psi, phi, etad, ksid);
+		for (int itr = 0; itr < maxItr; ++itr) {
+			updateJacobian(xc, yc, alpha, beta, gamma, etad, ksid);
+			xprev = xc;
+			yprev = yc;
+			//Successive Line Over Relaxation
+			for (int i = 1; i < N - 1; ++i) {
+				slor::slor(etad, ksid, &xc(i, 0), &yc(i, 0), &alpha(i, 0), &beta(i, 0), &gamma(i, 0), &phi(i, 0), &psi(i, 0));
+			}
 
-		double xerror = calcError(xprev, xc);
-		double yerror = calcError(yprev, yc);
-		std::cout << "At iteration" << itr << ", the error is : xerror = " << xerror << ", yerror = " << yerror << endl;
-		if (xerror < tol && yerror < tol) {
-			std::cout << "Solution Converged" << endl;
-			break;
+			double xerror = calcError(xprev, xc);
+			double yerror = calcError(yprev, yc);
+			std::cout << "At iteration" << itr << ", the error is : xerror = " << xerror << ", yerror = " << yerror << endl;
+			if (xerror < tol && yerror < tol) {
+				std::cout << "Solution Converged" << endl;
+				break;
+			}
 		}
 	}
+	
 
 	fo.close();
 
@@ -340,6 +345,6 @@ int main() {
 	fo.write((char*)yc.data(), sizeof(double) * yc.getSize());
 	fo.close();
 
-	//system("PAUSE");
+	system("PAUSE");
 	return 0;
 }
