@@ -1,16 +1,19 @@
-function [ c, c1, c2, c3, c4 ] = ring(N, M)
+function [ c, c1, c2, c3, c4 ] = ring(N, M, ri, ro)
 %NOZZEL Summary of this function goes here
 %   Detailed explanation goes here
-
-ri = 1;
-ro = 2;
+% 
+% ri = 1;
+% ro = 2;
 
 Mpos = linspace(0, 1, M);
+
 % exponential clustering
-r = 4;
-Npts = linspace(0, 1, N);
-Npos = -1 / (1 - exp(-r)) * (exp(-r * Npts) - 1);
-Npos = fliplr(1 - Npos);
+% r = 4;
+% Npts = linspace(0, 1, N);
+% Npos = -1 / (1 - exp(-r)) * (exp(-r * Npts) - 1);
+% Npos = fliplr(1 - Npos);
+% linear
+Npos = linspace(0, 1, N);
 
 
 ang = linspace(0, 2 * pi, M);

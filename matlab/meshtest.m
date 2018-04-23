@@ -6,7 +6,8 @@ fileID = fopen('../output/bnd.bin', 'wb');
 N = 20;
 M = 40;
 
-[c, c1, c2, c3, c4] = ring(N, M);
+[c, c1, c2, c3, c4] = ring(N, M, 1, 2);
+% [c, c1, c2, c3, c4] = nozzel(N, M);
 plotarrow(gca, c1(1,:), c1(2,:), 1);
 plotarrow(gca, c2(1,:), c2(2,:), 2);
 plotarrow(gca, c3(1,:), c3(2,:), 3);
