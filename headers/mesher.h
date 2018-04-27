@@ -15,7 +15,7 @@ class mesher {
 private:
     int clustering;
     int N, M;
-    int maxItr = 200;
+    int maxItr = 400;
     double d2, d1;
     double tol = 1e-5;
     
@@ -129,7 +129,6 @@ void mesher::getPQ() {
         yp = FIR_DER_X(yc, i, 0);
         ypp = SEC_DER_X(yc, i, 0);
         phi(i, 0) = -(xp * xpp + yp * ypp) / (xp * xp + yp * yp);
-        
     }
     
     for (int j = 1; j < M - 1; ++j) {
@@ -160,10 +159,9 @@ void mesher::getPQ() {
 
 void mesher::init(std::string filename) {
     fo.open(filename, std::ios::binary | std::ios::in);
-    if (!fo.is_open()) {
-        std::cout << "Fail to open " << filename << "\n";
-        exit(1);
-    }
+    if (!fo.is_open())
+        throw std::runtime_error("Fail to open " + filename);
+    
     fo.read((char*)&clustering, sizeof(int));
     fo.read((char*)&N, sizeof(int));
     fo.read((char*)&M, sizeof(int));
@@ -204,7 +202,7 @@ void mesher::init(std::string filename) {
     beta.ones(N, M);
     
     //slor buffer arrays
-    omega = 1.7;
+    omega = 1.5;
     aa = new double[M];
     dd = new double[M];
     cc = new double[M];
@@ -213,10 +211,11 @@ void mesher::init(std::string filename) {
     tmp = new double[M];
     xtmp= new double[M];
     ytmp = new double[M];
+    
 }
 
 void mesher::getMesh() {
-    for(int itr = 0; itr < maxItr; ++itr) {
+    for (int itr = 0; itr < maxItr; ++itr) {
         updateJacobian();
         xprev = xc;
         yprev = yc;
@@ -265,6 +264,9 @@ void mesher::output(std::string filename) {
     }
     
     std::cout << xc.getSize() << " " << yc.getSize() << "\n";
+    std::cout << "Omega = " << omega << "\n";
+    fo.write((char*)&N, sizeof(int));
+    fo.write((char*)&M, sizeof(int));
     fo.write((char*)xc.data(), sizeof(double) * xc.getSize());
     fo.write((char*)yc.data(), sizeof(double) * yc.getSize());
     fo.close();

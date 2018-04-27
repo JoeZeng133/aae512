@@ -44,13 +44,14 @@ double calcError(const Mat& A, const Mat& B) {
     //p2 norm
     int N, M;
     double arg, diff = 0, norm = 0;
+    double res = 1e-16;
     A.getSize(N, M);
     
     for (int i = 0; i < N; ++i)
         for (int j = 0; j < M; ++j) {
             arg = A(i, j) - B(i, j);
-            diff += arg * arg;
-            norm += A(i, j) * A(i, j);
+            if (A(i, j) != 0)
+                res = max(res, abs(arg / A(i, j)));
         }
-    return sqrt(diff / norm);
+    return res;
 }

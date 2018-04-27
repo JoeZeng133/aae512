@@ -10,7 +10,7 @@ private:
     int N, M;
     double d1, d2;
     double a, dt;
-    double tol = 1e-5;
+    double tol = 1e-7;
     int maxItr = 20;
     
     Mat xc, yc;
@@ -26,8 +26,8 @@ private:
 public:
     solver() = default;
 	void init(const Mat& xc, const Mat& yc, const double T0, const double T1, const double T2, const double _a, const double _dt);
+    void snapshot(std::fstream& ft);
 	double advance();
-    void snapshot();
     void ex_advance();
 };
 
@@ -138,32 +138,6 @@ void solver::init(const Mat& _xc, const Mat& _yc, const double T0, const double 
     //tridiagnal arrays init
     dd = new double[M];
     bb = new double[M];
-    
-//    fo.open("../output/debug.txt", std::ios::out);
-    
-//    for (int j = 1; j < M - 1; ++j)
-//        for (int i = 2; i < N; ++i)
-//            fo << L1(i, j) << " ";
-//
-//    for (int j = 1; j < M - 1; ++j)
-//        for (int i = 2; i < N; ++i)
-//            fo << L2(i, j) << " ";
-//
-//    for (int j = 1; j < M - 1; ++j)
-//        for (int i = 2; i < N; ++i)
-//            fo << g11(i, j) << " ";
-//
-//    for (int j = 1; j < M - 1; ++j)
-//        for (int i = 2; i < N; ++i)
-//            fo << g22(i, j) << " ";
-//
-//    for (int j = 1; j < M - 1; ++j)
-//        for (int i = 2; i < N; ++i)
-//            fo << g12(i, j) << " ";
-//    fo.close();
-    
-    fo.open("../output/res.bin", std::ios::out | std::ios::binary);
-    
 }
 
 void solver::ex_advance() {
@@ -221,8 +195,8 @@ double solver::advance() {
     return error;
 }
 
-void solver::snapshot() {
+void solver::snapshot(std::fstream& ft) {
     for(int j = 0; j < M; ++j)
         for (int i = 1; i <= N; ++i)
-            fo.write((char*)&T(i, j), sizeof(double));
+            ft.write((char*)&T(i, j), sizeof(double));
 }
