@@ -2,6 +2,15 @@ clear
 clc
 close all
 
+if ismac
+    exec = './main';
+elseif ispc
+    exec = 'main.exe';
+else
+    disp('Platform Not Supported')
+    return
+end
+
 T0 = 0;
 T1 = 100;
 T2 = 0;
@@ -17,7 +26,7 @@ P = 1000;
 % [x, y, r] = alge_mesh(N, M, ri, ro, 0.5, 1.02);
 
 % first clustering
-c = ring(N, M, 0.1, 0.3, 1, 1.1);
+c = ring(N, M, 0.1, 0.3, 1, 1.5);
 fileID = fopen('../output/bnd1.bin', 'wb');
 fwrite(fileID, [1, N, M] , 'int');
 fwrite(fileID, c, 'double');
@@ -29,8 +38,9 @@ fwrite(fileID, [1, N, M] , 'int');
 fwrite(fileID, c, 'double');
 fclose(fileID);
 
-!./main ../output/bnd1.bin ../output/mesh1.bin
-!./main ../output/bnd2.bin ../output/mesh2.bin
+system([exec, ' ../output/bnd1.bin ../output/mesh1.bin'])
+system([exec, ' ../output/bnd2.bin ../output/mesh2.bin'])
+
 [x1, y1] = readmesh('../output/mesh1.bin');
 r1 = sqrt(x1.^2 + y1.^2);
 figure(1)
@@ -49,8 +59,9 @@ fclose(fileID);
 
 
 % solving
-!./main ../output/mesh1.bin ../output/config.txt ../output/res1.bin
-!./main ../output/mesh2.bin ../output/config.txt ../output/res2.bin
+system([exec, ' ../output/mesh1.bin ../output/config.txt ../output/res1.bin']);
+system([exec, ' ../output/mesh2.bin ../output/config.txt ../output/res2.bin']);
+
 fileID = fopen('../output/res1.bin', 'rb');
 data1 = fread(fileID, N * M * P, 'double');
 data1 = reshape(data1, [N M P]);
@@ -70,7 +81,7 @@ Ftot = [Fs(:, tspan <= 0.3) Fa(:, tspan > 0.3)];
 
 %% plotting figures
 figure(3)
-tp = 10;
+tp = 1;
 slice = r1(N/2,:) < 0.12;
 plot(r1(N/2,slice), data1(N/2, slice, tp), 'rsq', 'markersize', 10), hold on
 
@@ -82,4 +93,4 @@ plot(rspan(slice), Ftot(slice, tp), 'k','linewidth', 1.5)
 
 xlabel('x [m]')
 ylabel('T [0^C]')
-legend({'Coarser clustering', 'Refined clustering', 'Analytic Solution'}, 'fontsize', 15)
+legend({'Coarse clustering', 'Refined clustering', 'Analytic Solution'}, 'fontsize', 15)

@@ -1,6 +1,6 @@
 function [xc, yc, N, M] = readmesh(filename)
 %READMESH read mesh from binary file
-%   Detailed explanation goes here
+
 fileID = fopen(filename, 'rb');
 N = fread(fileID, 1, 'int');
 M = fread(fileID, 1, 'int');

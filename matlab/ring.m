@@ -1,7 +1,7 @@
 function [ c, c1, c2, c3, c4 ] = ring(N, M, ri, ro, a, b)
-%NOZZEL Summary of this function goes here
-%   Detailed explanation goes here
-% 
+%NOZZEL generates mesh points along boundary of a hollow cylinder (ring)
+%for use in mesh generation, (a,b) are parameters to control mesh
+%distribution on the boundary.
 
 rpos = ptsclustering(M, a, b);
 angpos = linspace(0, 1, N);

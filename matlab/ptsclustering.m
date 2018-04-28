@@ -1,7 +1,7 @@
 function [d] = ptsclustering(N, a, b)
-%PTSCLUSTERING clustering of points at two sides
+%PTSCLUSTERING clusters points at two sides of (0,1)
 %  a determines clustering distribution between two sides, b determines
-%  extent of clustering
+%  level of clustering
 x = linspace(0, 1, N);
 
 if a > 0.5

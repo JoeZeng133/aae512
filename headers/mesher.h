@@ -259,7 +259,7 @@ void mesher::getMesh() {
 void mesher::output(std::string filename) {
     fo.open(filename, std::ios::out | std::ios::binary);
     if (!fo.is_open()) {
-        std::cout << "Fail to open" << filename << "\n";
+		throw std::runtime_error("Fail to open" + filename);
         exit(1);
     }
     

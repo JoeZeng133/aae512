@@ -1,6 +1,6 @@
 function writemesh(filename, xc, yc)
-%READMESH read mesh from binary file
-%   Detailed explanation goes here
+%READMESH write mesh to file
+
 fileID = fopen(filename, 'wb');
 fwrite(fileID, size(xc), 'int');
 fwrite(fileID, xc', 'double');

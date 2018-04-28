@@ -10,9 +10,18 @@ ro = 0.3;
 a = 143 / (2.8e3 * 795);
 
 dt = 0.1;
-N = 80;
-M = 40;
+N = 50;
+M = 25;
 P = 1000;
+
+if ismac
+    exec = './main';
+elseif ispc
+    exec = 'main.exe';
+else
+    disp('Platform Not Supported')
+    return
+end
 
 % [x, y, r] = alge_mesh(N, M, ri, ro, 0.5, 1.02);
 c = ring(N, M, 0.1, 0.3, 1, 2);
@@ -21,7 +30,7 @@ fwrite(fileID, [1, N, M] , 'int');
 fwrite(fileID, c, 'double');
 fclose(fileID);
 
-!./main ../output/bnd1.bin ../output/mesh1.bin
+system([exec, ' ../output/bnd1.bin ../output/mesh1.bin'])
 [x1, y1] = readmesh('../output/mesh1.bin');
 r1 = sqrt(x1.^2 + y1.^2);
 figure(1)
@@ -34,7 +43,8 @@ fprintf(fileID, '%d', P);
 fclose(fileID);
 
 % solving
-!./main ../output/mesh1.bin ../output/config.txt ../output/res1.bin
+
+system([exec, ' ../output/mesh1.bin ../output/config.txt ../output/res1.bin'])
 fileID = fopen('../output/res1.bin', 'rb');
 data1 = fread(fileID, N * M * P, 'double');
 data1 = reshape(data1, [N M P]);

@@ -1,6 +1,5 @@
 function [x, y, r] = alge_mesh(N, M, ri, ro, a, b)
-%ALGE_MESH Summary of this function goes here
-%   Detailed explanation goes here
+%ALGE_MESH generates mesh for a ring using algebraic functions
 
 e1 = linspace(0, 1, N);
 e2 = ptsclustering(M, a, b);
